@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>数码抽屉 - Digital Drawer</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide 图标库 -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            paper: {
+              50: '#fafaf9',
+              100: '#f5f5f4',
+              200: '#e7e5e4',
+              300: '#d6d3d1',
+              400: '#a8a29e',
+              500: '#78716c',
+              600: '#57534e',
+              700: '#44403c',
+              800: '#292524',
+              900: '#1c1917',
+              950: '#141413',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* 隐藏滚动条但保留平滑滚动 */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-[#f7f7f6] dark:bg-[#141413] text-stone-800 dark:text-stone-200 min-h-screen transition-colors duration-300 antialiased font-sans flex flex-col justify-between selection:bg-stone-300 dark:selection:bg-stone-700">
+
+  <!-- ================= 顶部极简导航栏 ================= -->
+  <header class="sticky top-0 z-40 bg-[#f7f7f6]/95 dark:bg-[#141413]/95 backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800/80 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-24 gap-4 lg:gap-8">
+        
+        <!-- 左侧：放大的 Logo 容器 -->
+        <a href="#home" onclick="showHomePage('全部')" class="flex items-center active:scale-95 transition-transform shrink-0 py-1" title="返回首页">
+          <img 
+            src="./images/logo.png" 
+            alt="数码抽屉 / Digital Drawer" 
+            class="h-12 sm:h-14 md:h-16 w-auto object-contain transition-all"
+            onerror="this.onerror=null; this.outerHTML='<div class=\'flex items-center gap-2.5 text-stone-900 dark:text-stone-100 font-extrabold text-2xl tracking-tight\'><div class=\'w-10 h-10 rounded-2xl bg-stone-800 text-white dark:bg-stone-100 dark:text-stone-900 flex items-center justify-center shadow-sm\'><i data-lucide=\'box\' class=\'w-6 h-6\'></i></div><span>数码抽屉</span></div>'; lucide.createIcons();"
+          />
+        </a>
+
+        <!-- 中部：单行不换行、温润灰调选中的分类导航 -->
+        <nav class="hidden lg:flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2 font-medium shrink-0">
+          <button onclick="showHomePage('全部')" class="cat-pill whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold transition-all bg-stone-200/90 text-stone-900 border border-stone-300/80 dark:bg-stone-800 dark:text-stone-100 dark:border-stone-700 shadow-sm" data-cat="全部">全部</button>
+          <button onclick="showHomePage('网络加速')" class="cat-pill whitespace-nowrap px-4 py-2 rounded-full text-sm text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-200/50 dark:hover:bg-stone-800/50 transition-all" data-cat="网络加速">网络加速</button>
+          <button onclick="showHomePage('谷歌服务')" class="cat-pill whitespace-nowrap px-4 py-2 rounded-full text-sm text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-200/50 dark:hover:bg-stone-800/50 transition-all" data-cat="谷歌服务">谷歌服务</button>
+          <button onclick="showHomePage('AI探索')" class="cat-pill whitespace-nowrap px-4 py-2 rounded-full text-sm text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-200/50 dark:hover:bg-stone-800/50 transition-all" data-cat="AI探索">AI探索</button>
+          <button onclick="showHomePage('NAS私有云')" class="cat-pill whitespace-nowrap px-4 py-2 rounded-full text-sm text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-200/50 dark:hover:bg-stone-800/50 transition-all" data-cat="NAS私有云">NAS私有云</button>
+          <button onclick="showHomePage('极客工具')" class="cat-pill whitespace-nowrap px-4 py-2 rounded-full text-sm text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-200/50 dark:hover:bg-stone-800/50 transition-all" data-cat="极客工具">极客工具</button>
+          <button onclick="showHomePage('脚本教程')" class="cat-pill whitespace-nowrap px-4 py-2 rounded-full text-sm text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-200/50 dark:hover:bg-stone-800/50 transition-all" data-cat="脚本教程">脚本教程</button>
+        </nav>
+
+        <!-- 右侧：快捷工具与主题切换 -->
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div class="hidden sm:flex items-center gap-2 text-sm text-stone-600 dark:text-stone-300 font-medium border-r border-stone-200 dark:border-stone-800 pr-3">
+            <a href="https://it-tools.tech" target="_blank" class="px-3 py-1.5 rounded-xl hover:bg-stone-200/60 dark:hover:bg-stone-800/80 transition-colors">IT-Tools</a>
+            <a href="https://ping0.cc/" target="_blank" class="px-3 py-1.5 rounded-xl hover:bg-stone-200/60 dark:hover:bg-stone-800/80 transition-colors">IP查询</a>
+          </div>
+
+          <!-- 亮色/深色模式切换按钮 -->
+          <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2.5 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-stone-800/80 transition-colors" title="切换深浅主题">
+            <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+            <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+          </button>
+
+          <!-- 移动端汉堡菜单按钮 -->
+          <button onclick="toggleMobileNav()" class="lg:hidden p-2.5 rounded-xl text-stone-700 dark:text-stone-200 hover:bg-stone-200/60 dark:hover:bg-stone-800 transition-colors">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- 移动端抽屉菜单 -->
+      <div id="mobileNavMenu" class="hidden lg:hidden py-4 border-t border-stone-200 dark:border-stone-800 flex flex-wrap gap-2 text-sm">
+        <button onclick="showHomePage('全部'); toggleMobileNav()" class="px-4 py-2 rounded-full bg-stone-200 text-stone-900 dark:bg-stone-800 dark:text-stone-100 font-medium">全部</button>
+        <button onclick="showHomePage('网络加速'); toggleMobileNav()" class="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800/50 text-stone-700 dark:text-stone-300 font-medium">网络加速</button>
+        <button onclick="showHomePage('谷歌服务'); toggleMobileNav()" class="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800/50 text-stone-700 dark:text-stone-300 font-medium">谷歌服务</button>
+        <button onclick="showHomePage('AI探索'); toggleMobileNav()" class="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800/50 text-stone-700 dark:text-stone-300 font-medium">AI探索</button>
+        <button onclick="showHomePage('NAS私有云'); toggleMobileNav()" class="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800/50 text-stone-700 dark:text-stone-300 font-medium">NAS私有云</button>
+        <button onclick="showHomePage('极客工具'); toggleMobileNav()" class="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800/50 text-stone-700 dark:text-stone-300 font-medium">极客工具</button>
+        <button onclick="showHomePage('脚本教程'); toggleMobileNav()" class="px-4 py-2 rounded-full bg-stone-100 dark:bg-stone-800/50 text-stone-700 dark:text-stone-300 font-medium">脚本教程</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= 主体内容容器 ================= -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1">
+
+    <!-- ========== 视图 1：首页视图 ========== -->
+    <div id="homeView" class="space-y-10">
+
+      <!-- 居中焦点横幅 (Hero Banner) -->
+      <section class="relative rounded-3xl overflow-hidden border border-stone-200/80 dark:border-stone-800/80 bg-gradient-to-r from-[#eae8e4] via-[#f0eeeb] to-[#e6e4df] dark:from-[#1c1c1b] dark:via-[#212120] dark:to-[#1a1a19] shadow-sm">
+        
+        <div class="absolute right-12 top-1/2 -translate-y-1/2 pointer-events-none opacity-30 dark:opacity-15 hidden md:block">
+          <svg width="220" height="170" viewBox="0 0 200 160" fill="none" class="text-stone-500 dark:text-stone-400 stroke-current">
+            <circle cx="100" cy="80" r="60" stroke-width="0.8" stroke-dasharray="3 3"/>
+            <path d="M40 120 C 70 50, 130 50, 160 120" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M60 140 C 90 70, 140 80, 170 30" stroke-width="0.8"/>
+            <circle cx="140" cy="50" r="3" fill="currentColor"/>
+          </svg>
+        </div>
+
+        <div id="bannerCarousel" class="relative min-h-[220px] sm:min-h-[250px] flex flex-col items-center justify-center text-center px-6 py-10 sm:py-14 z-10">
+          
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium bg-stone-300/50 dark:bg-stone-700/50 text-stone-700 dark:text-stone-300 mb-4 border border-stone-300/70 dark:border-stone-700/70 backdrop-blur">
+            <span class="w-1.5 h-1.5 rounded-full bg-stone-500 animate-pulse"></span>
+            <span>随笔 & 数字化思考</span>
+          </div>
+
+          <h1 id="bannerMainText" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 mb-3 transition-opacity duration-300">
+            人生 · 贵在坚持
+          </h1>
+
+          <p id="bannerSubText" class="text-base sm:text-lg lg:text-xl text-stone-600 dark:text-stone-400 font-light tracking-wide transition-opacity duration-300 max-w-2xl">
+            换个角度，你会发现不一样的风景
+          </p>
+
+        </div>
+
+        <button onclick="prevBanner()" class="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-white/70 dark:bg-stone-800/70 hover:bg-white dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 backdrop-blur border border-stone-200/60 dark:border-stone-700/60 transition-all shadow-sm z-20" title="上一条">
+          <i data-lucide="chevron-left" class="w-5 h-5"></i>
+        </button>
+        <button onclick="nextBanner()" class="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-white/70 dark:bg-stone-800/70 hover:bg-white dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 backdrop-blur border border-stone-200/60 dark:border-stone-700/60 transition-all shadow-sm z-20" title="下一条">
+          <i data-lucide="chevron-right" class="w-5 h-5"></i>
+        </button>
+      </section>
+
+      <!-- 双列内容流结构 -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- 左侧文章网格 -->
+        <div class="lg:col-span-8 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-stone-200/80 dark:border-stone-800/80">
+            <div class="flex items-center gap-2.5">
+              <div class="w-1.5 h-5 bg-stone-800 dark:bg-stone-200 rounded-full"></div>
+              <h2 id="currentCategoryTitle" class="text-xl font-bold text-stone-900 dark:text-stone-100 tracking-tight">全部文章</h2>
+              <span id="articleCountBadge" class="text-xs text-stone-400 font-medium">共 4 篇</span>
+            </div>
+
+            <!-- 极简搜索框 -->
+            <div class="relative w-full sm:w-64">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input 
+                type="text" 
+                id="searchInput" 
+                oninput="handleSearch(this.value)" 
+                placeholder="搜索标题或标签..." 
+                class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-800 bg-white/80 dark:bg-stone-900/80 text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-1 focus:ring-stone-400"
+              />
+            </div>
+          </div>
+
+          <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- 动态渲染文章卡片 -->
+          </div>
+        </div>
+
+        <!-- 右侧侧边栏 -->
+        <aside class="lg:col-span-4 space-y-5">
+          <!-- 1. 公告 -->
+          <div class="p-6 rounded-2xl bg-white/70 dark:bg-stone-900/70 border border-stone-200/80 dark:border-stone-800/80 shadow-sm">
+            <div class="flex items-center gap-2 mb-2.5 text-stone-700 dark:text-stone-300">
+              <i data-lucide="bell" class="w-4 h-4 text-stone-500"></i>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-stone-900 dark:text-stone-100">公告 / Notice</h3>
+            </div>
+            <p class="text-xs text-stone-500 dark:text-stone-400 leading-relaxed font-light">
+              欢迎来到数码抽屉。这里专注整理实用的网络加速、NAS 云存储与数字工具干货。换个角度，发现不一样的风景。
+            </p>
+          </div>
+
+          <!-- 2. 常用工具 -->
+          <div class="p-6 rounded-2xl bg-white/70 dark:bg-stone-900/70 border border-stone-200/80 dark:border-stone-800/80 shadow-sm">
+            <div class="flex items-center gap-2 mb-3 text-stone-700 dark:text-stone-300">
+              <i data-lucide="wrench" class="w-4 h-4 text-stone-500"></i>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-stone-900 dark:text-stone-100">常用工具 / Tools</h3>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <a href="https://it-tools.tech" target="_blank" class="p-2.5 rounded-xl bg-stone-100/70 dark:bg-stone-800/60 hover:bg-stone-200 dark:hover:bg-stone-700/60 text-stone-700 dark:text-stone-300 transition-colors flex items-center gap-2">
+                <i data-lucide="cpu" class="w-3.5 h-3.5 text-stone-500"></i>
+                <span>IT-Tools</span>
+              </a>
+              <a href="https://ping0.cc/" target="_blank" class="p-2.5 rounded-xl bg-stone-100/70 dark:bg-stone-800/60 hover:bg-stone-200 dark:hover:bg-stone-700/60 text-stone-700 dark:text-stone-300 transition-colors flex items-center gap-2">
+                <i data-lucide="globe" class="w-3.5 h-3.5 text-stone-500"></i>
+                <span>IP 查询</span>
+              </a>
+              <a href="https://github.com" target="_blank" class="p-2.5 rounded-xl bg-stone-100/70 dark:bg-stone-800/60 hover:bg-stone-200 dark:hover:bg-stone-700/60 text-stone-700 dark:text-stone-300 transition-colors flex items-center gap-2">
+                <i data-lucide="github" class="w-3.5 h-3.5 text-stone-500"></i>
+                <span>GitHub</span>
+              </a>
+              <a href="https://hub.docker.com" target="_blank" class="p-2.5 rounded-xl bg-stone-100/70 dark:bg-stone-800/60 hover:bg-stone-200 dark:hover:bg-stone-700/60 text-stone-700 dark:text-stone-300 transition-colors flex items-center gap-2">
+                <i data-lucide="container" class="w-3.5 h-3.5 text-stone-500"></i>
+                <span>Docker</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- 3. 标签云 -->
+          <div class="p-6 rounded-2xl bg-white/70 dark:bg-stone-900/70 border border-stone-200/80 dark:border-stone-800/80 shadow-sm">
+            <div class="flex items-center gap-2 mb-3 text-stone-700 dark:text-stone-300">
+              <i data-lucide="tag" class="w-4 h-4 text-stone-500"></i>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-stone-900 dark:text-stone-100">热门标签 / Tags</h3>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span onclick="searchTag('Docker')" class="cursor-pointer text-xs px-3 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-800 hover:text-white dark:hover:bg-stone-200 dark:hover:text-stone-900 transition-colors">#Docker</span>
+              <span onclick="searchTag('NAS')" class="cursor-pointer text-xs px-3 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-800 hover:text-white dark:hover:bg-stone-200 dark:hover:text-stone-900 transition-colors">#NAS</span>
+              <span onclick="searchTag('软路由')" class="cursor-pointer text-xs px-3 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-800 hover:text-white dark:hover:bg-stone-200 dark:hover:text-stone-900 transition-colors">#软路由</span>
+              <span onclick="searchTag('效率工具')" class="cursor-pointer text-xs px-3 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-800 hover:text-white dark:hover:bg-stone-200 dark:hover:text-stone-900 transition-colors">#效率工具</span>
+              <span onclick="searchTag('Google')" class="cursor-pointer text-xs px-3 py-1 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-800 hover:text-white dark:hover:bg-stone-200 dark:hover:text-stone-900 transition-colors">#Google</span>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ========== 视图 2：独立文章详情页（直进页面） ========== -->
+    <div id="articleDetailView" class="hidden max-w-4xl mx-auto py-4 animate-in fade-in duration-300">
+      
+      <!-- 返回按钮栏 -->
+      <div class="mb-8 pb-4 border-b border-stone-200/80 dark:border-stone-800/80 flex items-center justify-between">
+        <button onclick="showHomePage()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300 text-sm font-medium transition-all shadow-sm">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>返回文章列表</span>
+        </button>
+        <span id="detailCategory" class="text-xs font-semibold px-3 py-1 rounded-md bg-stone-200/80 dark:bg-stone-800 text-stone-700 dark:text-stone-300">分类</span>
+      </div>
+
+      <!-- 文章正文区域 -->
+      <article class="bg-white/80 dark:bg-stone-900/80 border border-stone-200/80 dark:border-stone-800/80 rounded-3xl p-6 sm:p-12 shadow-sm">
+        <h1 id="detailTitle" class="text-2xl sm:text-4xl font-extrabold text-stone-900 dark:text-stone-100 tracking-tight leading-tight mb-4"></h1>
+        
+        <div class="flex flex-wrap items-center gap-4 text-xs text-stone-400 pb-6 mb-8 border-b border-stone-100 dark:border-stone-800 font-light">
+          <span id="detailDate" class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-4 h-4"></i></span>
+          <span>•</span>
+          <span id="detailReadTime" class="flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4"></i></span>
+          <span>•</span>
+          <span id="detailViews" class="flex items-center gap-1.5"><i data-lucide="eye" class="w-4 h-4"></i></span>
+        </div>
+
+        <div id="detailContent" class="text-stone-700 dark:text-stone-300 text-base sm:text-lg leading-relaxed space-y-6 font-light">
+          <!-- 动态文章内容 -->
+        </div>
+
+        <div class="mt-12 pt-6 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between text-xs text-stone-400">
+          <span>本文发布于数码抽屉</span>
+          <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="hover:text-stone-600 dark:hover:text-stone-200 flex items-center gap-1">
+            <span>回到顶部</span>
+            <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </article>
+
+    </div>
+
+  </main>
+
+  <!-- ================= 极简页脚 ================= -->
+  <footer class="mt-16 border-t border-stone-200/80 dark:border-stone-800/80 bg-white/40 dark:bg-stone-950/40 py-8 text-center text-xs text-stone-400 font-light">
+    <div class="max-w-7xl mx-auto px-4">
+      <p>© 2026 数码抽屉 (Digital Drawer). 换个角度，发现不一样的风景.</p>
+    </div>
+  </footer>
+
+  <!-- ================= 核心脚本数据 ================= -->
+  <script>
+    // 轮播 Banner 数据
+    const BANNERS = [
+      { main: "人生 · 贵在坚持", sub: "换个角度，你会发现不一样的风景" },
+      { main: "折腾 · 享受探索", sub: "把复杂的技术与网络，装进随手可及的抽屉" },
+      { main: "记录 · 沉淀思考", sub: "保持专注，保持对数字生活的热爱" }
+    ];
+    let bannerIdx = 0;
+
+    function nextBanner() {
+      bannerIdx = (bannerIdx + 1) % BANNERS.length;
+      updateBannerUI();
+    }
+    function prevBanner() {
+      bannerIdx = (bannerIdx - 1 + BANNERS.length) % BANNERS.length;
+      updateBannerUI();
+    }
+    function updateBannerUI() {
+      const mainEl = document.getElementById('bannerMainText');
+      const subEl = document.getElementById('bannerSubText');
+      mainEl.style.opacity = 0;
+      subEl.style.opacity = 0;
+      setTimeout(() => {
+        mainEl.textContent = BANNERS[bannerIdx].main;
+        subEl.textContent = BANNERS[bannerIdx].sub;
+        mainEl.style.opacity = 1;
+        subEl.style.opacity = 1;
+      }, 150);
+    }
+    setInterval(nextBanner, 7000);
+
+    // 文章数据源
+    const POSTS = [
+      {
+        id: 1,
+        category: "网络加速",
+        title: "Docker 搭建轻量级私有网络加速节点与测速工具",
+        summary: "从零开始在家庭小主机或 VPS 上快速容器化部署轻量网络工具面板，详细配置与持久化实践...",
+        date: "2026-10-27",
+        readTime: "8 分钟",
+        views: "1.2k",
+        cover: "./images/covers/post-1.jpg",
+        tags: ["Docker", "软路由"],
+        content: `
+          <p class="leading-relaxed">在日常折腾网络环境时，稳定与简便往往是最关键的考量。通过容器化技术（Docker），我们可以在不需要深入了解底层复杂依赖的情况下，秒级拉起网络诊断、测速面板与加速节点。</p>
+          <h3 class="text-xl font-bold text-stone-900 dark:text-stone-100 mt-6 mb-3">1. 基础环境准备</h3>
+          <p class="leading-relaxed">首先确保宿主机安装了最新的 Docker 与 Docker-Compose。网络模式建议采用 host 模式，以减少 NAT 层面的性能损耗，最大化发挥硬件吞吐能力。</p>
+          <div class="my-4 p-4 rounded-xl bg-stone-100 dark:bg-stone-800 font-mono text-sm">
+            docker run -d --name speedtest-server --restart always --net host adolfintel/speedtest
+          </div>
+          <h3 class="text-xl font-bold text-stone-900 dark:text-stone-100 mt-6 mb-3">2. 数据持久化策略</h3>
+          <p class="leading-relaxed">务必将容器内的配置目录映射至宿主机的 <code>/opt/data</code> 目录，防止更新镜像或重启机器时配置丢失。</p>
+        `
+      },
+      {
+        id: 2,
+        category: "NAS私有云",
+        title: "家用 NAS 私有存储安全策略：3-2-1 原则异地冷热备份落地",
+        summary: "如何搭建全自动异地容灾冷热双备份，确保家庭生活照片与关键数据高枕无忧...",
+        date: "2026-10-25",
+        readTime: "12 分钟",
+        views: "890",
+        cover: "./images/covers/post-2.jpg",
+        tags: ["NAS", "备份"],
+        content: `
+          <p class="leading-relaxed">硬盘有价，数据无价。很多朋友买了 NAS 后只做了 RAID1 镜像就以为万事大吉，但 RAID 并不是备份，它防不住勒索病毒和误删除事故。</p>
+          <h3 class="text-xl font-bold text-stone-900 dark:text-stone-100 mt-6 mb-3">什么是 3-2-1 备份原则？</h3>
+          <ul class="list-disc pl-6 space-y-2">
+            <li><strong>3 份数据副本</strong>：一份原始数据 + 至少两份独立备份。</li>
+            <li><strong>2 种不同介质</strong>：例如机械硬盘 + 移动 SSD / 异地对象存储。</li>
+            <li><strong>1 份异地存放</strong>：云端异地容灾，防止火灾、盗窃或本地物理损坏。</li>
+          </ul>
+          <p class="mt-4 leading-relaxed">本文手把手演示如何结合对象存储（Rclone + WebDAV）实现真正意义上的全自动化静默备份架构。</p>
+        `
+      },
+      {
+        id: 3,
+        category: "AI探索",
+        title: "本地大语言模型与私有知识库工作流实践全记录",
+        summary: "使用 Ollama 与知识库框架构建属于自己的完全离线私人数字秘书，安全无泄露风险...",
+        date: "2026-10-22",
+        readTime: "6 分钟",
+        views: "2.1k",
+        cover: "./images/covers/post-3.jpg",
+        tags: ["AI", "效率工具"],
+        content: `
+          <p class="leading-relaxed">随着小型开源量化模型能力的逐步提升，在普通 PC 或轻量工作站上进行离线知识库检索已成为现实。数据完全保存在本地磁盘，无需担心商业云端泄露隐患。</p>
+          <p class="leading-relaxed">本文将分享知识库清洗的最佳切片参数、重排模型（Rerank）的选择技巧，以及如何将知识库无缝嵌入日常生活流程。</p>
+        `
+      },
+      {
+        id: 4,
+        category: "极客工具",
+        title: "自建 IT-Tools 在线多功能极客工具箱实战",
+        summary: "将 70+ 个日常网络测试、加解密、时间戳计算工具整合到同一私有页面中，轻巧便捷...",
+        date: "2026-10-18",
+        readTime: "5 分钟",
+        views: "640",
+        cover: "./images/covers/post-4.jpg",
+        tags: ["效率工具", "Docker"],
+        content: `
+          <p class="leading-relaxed">IT-Tools 是目前广受好评的开发者与极客工具合集，支持 Token 生成、哈希换算、二维码制作与 CRON 规则测试。只需一条简单的 docker run 命令即可随时随地访问。</p>
+          <div class="my-4 p-4 rounded-xl bg-stone-100 dark:bg-stone-800 font-mono text-sm">
+            docker run -d --name it-tools --restart unless-stopped -p 8080:80 corentinth/it-tools:latest
+          </div>
+        `
+      }
+    ];
+
+    let currentFilter = '全部';
+    let currentSearch = '';
+
+    // 渲染文章列表
+    function renderPosts() {
+      const container = document.getElementById('postsContainer');
+      const countBadge = document.getElementById('articleCountBadge');
+      
+      const filtered = POSTS.filter(post => {
+        const matchesCategory = currentFilter === '全部' || post.category === currentFilter;
+        const matchesSearch = !currentSearch || 
+          post.title.toLowerCase().includes(currentSearch.toLowerCase()) ||
+          post.summary.toLowerCase().includes(currentSearch.toLowerCase()) ||
+          post.tags.some(t => t.toLowerCase().includes(currentSearch.toLowerCase()));
+        return matchesCategory && matchesSearch;
+      });
+
+      countBadge.textContent = `共 ${filtered.length} 篇`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-16 text-center text-stone-400">
+            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
+            <p class="text-sm">没有找到相关文章，换个搜索词试试？</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = filtered.map(post => `
+        <article onclick="navigateToPost(${post.id})" class="group cursor-pointer rounded-2xl bg-white/70 dark:bg-stone-900/70 border border-stone-200/80 dark:border-stone-800/80 hover:border-stone-400 dark:hover:border-stone-600 p-4 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 shadow-sm">
+          
+          <div class="relative w-full h-44 rounded-xl overflow-hidden bg-stone-200/60 dark:bg-stone-800 mb-3.5">
+            <img 
+              src="${post.cover}" 
+              alt="${post.title}" 
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80';"
+            />
+            <span class="absolute top-2.5 left-2.5 text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-stone-900/80 text-white backdrop-blur shadow-sm">
+              ${post.category}
+            </span>
+          </div>
+
+          <div>
+            <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 group-hover:text-stone-600 dark:group-hover:text-stone-300 transition-colors line-clamp-1 mb-1.5">
+              ${post.title}
+            </h3>
+            <p class="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 leading-relaxed mb-4 font-light">
+              ${post.summary}
+            </p>
+          </div>
+
+          <div class="pt-3 border-t border-stone-100 dark:border-stone-800/80 flex items-center justify-between text-[11px] text-stone-400">
+            <div class="flex items-center gap-2">
+              <span>${post.date}</span>
+              <span>•</span>
+              <span>${post.readTime}</span>
+            </div>
+            <div class="flex items-center gap-1 text-stone-700 dark:text-stone-300 font-medium group-hover:translate-x-1 transition-transform">
+              <span>阅读全文</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </div>
+          </div>
+
+        </article>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    // 单页切换：进入文章详情页面
+    function navigateToPost(id) {
+      const post = POSTS.find(p => p.id === id);
+      if (!post) return;
+
+      document.getElementById('detailCategory').textContent = post.category;
+      document.getElementById('detailTitle').textContent = post.title;
+      document.getElementById('detailDate').innerHTML = `<i data-lucide="calendar" class="w-4 h-4"></i> 发布于 ${post.date}`;
+      document.getElementById('detailReadTime').innerHTML = `<i data-lucide="clock" class="w-4 h-4"></i> 预估阅读 ${post.readTime}`;
+      document.getElementById('detailViews').innerHTML = `<i data-lucide="eye" class="w-4 h-4"></i> ${post.views} 次阅读`;
+      document.getElementById('detailContent').innerHTML = post.content;
+
+      document.getElementById('homeView').classList.add('hidden');
+      document.getElementById('articleDetailView').classList.remove('hidden');
+
+      window.location.hash = `post-${id}`;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    // 单页切换：返回首页
+    function showHomePage(cat) {
+      document.getElementById('articleDetailView').classList.add('hidden');
+      document.getElementById('homeView').classList.remove('hidden');
+      window.location.hash = 'home';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (cat) {
+        filterCategory(cat);
+      }
+    }
+
+    // 分类筛选事件（更新为温和的灰调高亮）
+    function filterCategory(cat) {
+      currentFilter = cat;
+      document.getElementById('currentCategoryTitle').textContent = cat === '全部' ? '全部文章' : `${cat} 专栏`;
+      
+      document.querySelectorAll('.cat-pill').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.className = "cat-pill whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold transition-all bg-stone-200/90 text-stone-900 border border-stone-300/80 dark:bg-stone-800 dark:text-stone-100 dark:border-stone-700 shadow-sm";
+        } else {
+          btn.className = "cat-pill whitespace-nowrap px-4 py-2 rounded-full text-sm text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-200/50 dark:hover:bg-stone-800/50 transition-all";
+        }
+      });
+
+      renderPosts();
+    }
+
+    // 实时搜索
+    function handleSearch(val) {
+      currentSearch = val.trim();
+      renderPosts();
+    }
+
+    // 标签点击过滤
+    function searchTag(tag) {
+      showHomePage('全部');
+      const input = document.getElementById('searchInput');
+      input.value = tag;
+      handleSearch(tag);
+    }
+
+    // 移动端折叠菜单
+    function toggleMobileNav() {
+      const menu = document.getElementById('mobileNavMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    // 主题切换
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    // 监听 Hash 路由
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash;
+      if (hash.startsWith('#post-')) {
+        const id = parseInt(hash.replace('#post-', ''));
+        navigateToPost(id);
+      } else {
+        showHomePage();
+      }
+    });
+
+    // 初始化
+    window.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+
+      renderPosts();
+      lucide.createIcons();
+
+      const hash = window.location.hash;
+      if (hash.startsWith('#post-')) {
+        const id = parseInt(hash.replace('#post-', ''));
+        navigateToPost(id);
+      }
+    });
+  </script>
+</body>
+</html>
